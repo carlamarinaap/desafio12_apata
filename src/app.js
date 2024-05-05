@@ -88,7 +88,8 @@ socketServer.on("connection", (socket) => {
     await productService.add(newProduct);
     const products = await productService.get({});
     const allProducts = await productService.get({ limit: products.totalDocs });
-    socketServer.emit("card", { allProducts, owner });
+    let added = true;
+    socketServer.emit("card", { allProducts, owner, added });
   });
 
   socket.on("deleteProduct", async (data) => {
@@ -98,7 +99,8 @@ socketServer.on("connection", (socket) => {
     if (product.owner === owner) {
       await pm.deleteProduct(prod);
       const allProducts = await productService.get({ limit: products.totalDocs });
-      socketServer.emit("card", { allProducts, owner });
+      let deleted = true;
+      socketServer.emit("card", { allProducts, owner, deleted });
     } else {
       const allProducts = await productService.get({ limit: products.totalDocs });
       socketServer.emit("card", { allProducts, owner });

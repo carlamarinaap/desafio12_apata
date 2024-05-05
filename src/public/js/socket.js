@@ -24,6 +24,28 @@ addProd.addEventListener("click", (e) => {
 });
 
 socket.on("card", (data) => {
+  if (data.added) {
+    Swal.fire({
+      title: "Agregado!",
+      text: "El producto fue agregado con éxito",
+      icon: "success",
+    }).then(() => {});
+  } else {
+    if (data.deleted) {
+      Swal.fire({
+        title: "Eliminado!",
+        text: "El producto fue eliminado con éxito",
+        icon: "success",
+      }).then(() => {});
+    } else {
+      Swal.fire({
+        title: "No autorizado!",
+        text: "Usted no puede eliminar ese producto",
+        icon: "error",
+      }).then(() => {});
+    }
+  }
+
   const allCArds = data.allProducts.payload.map((prod) => {
     return `
     <div class="card m-1 bg-light" style="width: 18rem;">
@@ -57,11 +79,6 @@ const deleteProd = (prod, owner) => {
   }).then((result) => {
     if (result.isConfirmed) {
       socket.emit("deleteProduct", { prod, owner });
-      Swal.fire({
-        title: "Eliminado!",
-        text: "El producto fue eliminado con éxito",
-        icon: "success",
-      }).then(() => {});
     }
   });
 };

@@ -86,7 +86,7 @@ export async function deleteProduct(req, res) {
         res.status(200).send(`Producto eliminado`);
       } else {
         req.logger.INFO(`Usted no puede eliminar un producto que no le pertenece`);
-        res.render("realTimeProducts");
+        res.render("/realTimeProducts");
       }
     } else {
       await productService.delete(req.params.pid);
@@ -117,8 +117,8 @@ export async function verifyRole(req, res, next) {
   try {
     if (!req.signedCookies.jwt) {
       req.logger.ERROR("No está logueado");
-      let msg = "Debe loguearse para continuar";
-      res.render("login", { msg });
+      let msg = "Debe estar logueado para ver los productos";
+      return res.render("login", { msg });
     }
     const userId = jwt.verify(req.signedCookies.jwt, config.privateKey).id;
     if (userId === 1) {
@@ -130,8 +130,8 @@ export async function verifyRole(req, res, next) {
         req.logger.INFO("Usuario autorizado");
         next();
       } else {
-        req.logger.INFO(`Usted no está autorizado`);
-        res.status(403).redirect("login");
+        req.logger.INFO(`Usuario no autorizado`);
+        return res.status(403).redirect("products");
       }
     }
   } catch (error) {
