@@ -167,5 +167,8 @@ app.get("/mail", async (req, res) => {
     });
     let msg = "Se le ha enviado un correo para la recuperación de la contraseña";
     res.render("login", { msg });
+  } else {
+    let msg = "El correo es incorrecto";
+    res.render("passwordRestore", { msg });
   }
 });
