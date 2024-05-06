@@ -1,7 +1,13 @@
+import config from "../config/config.js";
 import CartManager from "../dao/manager_mongo/cartsManager.js";
+import ProductManager from "../dao/manager_mongo/productManager.js";
+import UserManager from "../dao/manager_mongo/userManager.js";
 import { NotFound } from "../test/customError.js";
+import jwt from "jsonwebtoken";
 
 const cm = new CartManager();
+const pm = new ProductManager();
+const um = new UserManager();
 export async function getCarts(req, res) {
   try {
     const carts = await cm.getCarts();
@@ -42,9 +48,17 @@ export async function addCart(req, res) {
 
 export async function addProductInCart(req, res) {
   try {
-    await cm.updateCart(req.params.cid, req.params.pid);
-    req.logger.INFO(`Se agregó un producto al carrito`);
-    res.status(200).send("Producto añadido al carrito");
+    const product = await pm.getProductById(req.params.pid);
+    const userId = jwt.verify(req.signedCookies.jwt, config.privateKey).id;
+    const user = await um.getUserById(userId);
+    if (product.owner !== user.email) {
+      await cm.updateCart(req.params.cid, req.params.pid);
+      req.logger.INFO(`Se agregó un producto al carrito`);
+      res.status(200).send("Producto añadido al carrito");
+    } else {
+      req.logger.INFO(`No puede agregar al carrito productos creados por usted`);
+      res.send("No puede agregar al carrito productos creados por usted");
+    }
   } catch (error) {
     if (error instanceof NotFound) {
       req.logger.ERROR(error.message);
