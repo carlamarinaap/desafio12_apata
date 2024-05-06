@@ -10,6 +10,7 @@ import {
   profileView,
   realTimeProducts,
   registerView,
+  restoreLinkView,
   rootView,
   socketView,
 } from "../controllers/views.controller.js";
@@ -29,6 +30,7 @@ router.get("/profile", profileView);
 router.get("/failRegister", failRegisterView);
 router.get("/faillogin", failloginView);
 router.get("/passwordRestore", passwordRestoreView);
+router.get("/restoreLink", restoreLinkView);
 router.get("/mockingproducts", mockingProducts);
 
 export default router;

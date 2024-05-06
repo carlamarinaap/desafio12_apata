@@ -5,6 +5,7 @@ import userSchema from "../dao/models/user.schema.js";
 import config from "../config/config.js";
 import { port } from "../commander.js";
 import { productService, userService } from "../repositories/index.js";
+import { verifyEmailToken } from "../config/passport.config.js";
 
 const mm = new MessageManager();
 const cm = new CartsManager();
@@ -136,6 +137,17 @@ export async function profileView(req, res) {
 
 export async function passwordRestoreView(req, res) {
   res.render("passwordRestore");
+}
+export async function restoreLinkView(req, res) {
+  let email = req.query.email;
+  const token = req.cookies.emailToken;
+  console.log(token);
+  const isValidToken = verifyEmailToken(token);
+  if (!isValidToken) {
+    let msg = "El enlace ha expirado";
+    return res.render("login", { msg });
+  }
+  res.render("restoreLink", { email, token });
 }
 
 export async function registerView(req, res) {

@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
 import StrategyGitHub from "passport-github2";
-import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
+import { Strategy as JwtStrategy } from "passport-jwt";
 import cartManager from "../dao/manager_mongo/cartsManager.js";
 import jwt from "jsonwebtoken";
 import config from "./config.js";
@@ -40,6 +40,25 @@ export const requireJwtAuth = passport.authenticate("jwt", { session: false });
 export const generateToken = (user) => {
   let token = jwt.sign({ id: user._id }, config.privateKey, { expiresIn: "24h" });
   return token;
+};
+
+export const generateEmailToken = (email) => {
+  const payload = {
+    email,
+    timestamp: Date.now(), // Marca de tiempo en milisegundos
+  };
+  return jwt.sign(payload, config.privateKey, { expiresIn: 10 }); // Expira en 10 segundos
+};
+
+export const verifyEmailToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, config.privateKey);
+    const { timestamp } = decoded;
+    const currentTime = Date.now();
+    return currentTime - timestamp < 10 * 1000; // Verificar si han pasado menos de 10 segundos
+  } catch (error) {
+    return false; // Token inválido
+  }
 };
 
 passport.use(

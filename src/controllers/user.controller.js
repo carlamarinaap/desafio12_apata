@@ -2,6 +2,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
 import { userService } from "../repositories/index.js";
+import { verifyEmailToken } from "../config/passport.config.js";
 
 export async function register(req, res, next) {
   passport.authenticate("register", async (err, user) => {
@@ -63,10 +64,18 @@ export async function logout(req, res) {
 export async function passwordRestore(req, res) {
   try {
     let { email, password, confirm } = req.body;
+    const token = req.cookies.emailToken;
+    console.log(token, req.cookie);
+    const isValidToken = verifyEmailToken(token);
+    if (!isValidToken) {
+      let msg = "El enlace ha expirado";
+      return res.render("login", { msg });
+    }
     const user = await userService.getByEmail(email);
     if (user && password && confirm && password === confirm) {
       await userService.updatePassword(email, password);
-      res.redirect("/login");
+      let msg = "Contraseña cambiada con éxito";
+      res.render("login", { msg });
     }
   } catch (error) {
     req.logger.ERROR(error.message);
