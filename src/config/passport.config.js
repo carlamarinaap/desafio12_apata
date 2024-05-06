@@ -47,7 +47,7 @@ export const generateEmailToken = (email) => {
     email,
     timestamp: Date.now(), // Marca de tiempo en milisegundos
   };
-  return jwt.sign(payload, config.privateKey, { expiresIn: 10 }); // Expira en 10 segundos
+  return jwt.sign(payload, config.privateKey, { expiresIn: "1h" }); // Expira en 10 segundos
 };
 
 export const verifyEmailToken = (token) => {
@@ -55,7 +55,7 @@ export const verifyEmailToken = (token) => {
     const decoded = jwt.verify(token, config.privateKey);
     const { timestamp } = decoded;
     const currentTime = Date.now();
-    return currentTime - timestamp < 10 * 1000; // Verificar si han pasado menos de 10 segundos
+    return currentTime - timestamp < 60 * 60 * 1000; // Verificar si han pasado menos de una hora
   } catch (error) {
     return false; // Token inválido
   }

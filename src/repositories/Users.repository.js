@@ -24,4 +24,7 @@ export default class UserRepository {
   updatePassword = async (email, password) => {
     this.dao.updatePassword(email, password);
   };
+  updateRole = async (email, role) => {
+    this.dao.updateRole(email, role);
+  };
 }

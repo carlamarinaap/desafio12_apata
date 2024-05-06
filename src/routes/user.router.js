@@ -8,6 +8,7 @@ import {
   logout,
   passwordRestore,
   register,
+  changeRole,
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
@@ -28,5 +29,7 @@ router.get(
   githubcallbackapata
 );
 router.get("/current", current);
+
+router.put("/premium/:uid", changeRole);
 
 export default router;

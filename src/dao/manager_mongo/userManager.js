@@ -59,6 +59,17 @@ class UserManager {
       throw new Error(error.message);
     }
   };
+  updateRole = async (email, role) => {
+    try {
+      await UserSchema.findOneAndUpdate(
+        { email: email },
+        { $set: { role: role } },
+        { new: true }
+      );
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
 }
 
 export default UserManager;

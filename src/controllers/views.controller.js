@@ -141,7 +141,6 @@ export async function passwordRestoreView(req, res) {
 export async function restoreLinkView(req, res) {
   let email = req.query.email;
   const token = req.cookies.emailToken;
-  console.log(token);
   const isValidToken = verifyEmailToken(token);
   if (!isValidToken) {
     let msg = "El enlace ha expirado";

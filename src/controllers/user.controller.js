@@ -65,17 +65,23 @@ export async function passwordRestore(req, res) {
   try {
     let { email, password, confirm } = req.body;
     const token = req.cookies.emailToken;
-    console.log(token, req.cookie);
     const isValidToken = verifyEmailToken(token);
     if (!isValidToken) {
       let msg = "El enlace ha expirado";
       return res.render("login", { msg });
     }
     const user = await userService.getByEmail(email);
+
     if (user && password && confirm && password === confirm) {
-      await userService.updatePassword(email, password);
-      let msg = "Contraseña cambiada con éxito";
-      res.render("login", { msg });
+      const currentPassword = await userService.getByCreds(email, password);
+      if (!currentPassword) {
+        await userService.updatePassword(email, password);
+        let msg = "Contraseña cambiada con éxito";
+        res.render("login", { msg });
+      } else {
+        let msg = "No puede utilizar la contraseña anterior";
+        res.render("login", { msg });
+      }
     }
   } catch (error) {
     req.logger.ERROR(error.message);
@@ -113,6 +119,19 @@ export async function githubcallbackapata(req, res) {
   } catch (error) {
     res.status(500).send(error.message);
   }
+}
+
+export async function changeRole(req, res) {
+  try {
+    const user = await userService.getById(req.params.uid);
+    if (user && user.role === "premium") {
+      await userService.updateRole(user.email, "user");
+    }
+    if (user && user.role === "user") {
+      await userService.updateRole(user.email, "premium");
+    }
+    res.status(200).send("Rol del usuario cambiado con éxito");
+  } catch (error) {}
 }
 
 export async function githubLogin(req, res) {}

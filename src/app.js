@@ -96,7 +96,7 @@ socketServer.on("connection", (socket) => {
     const { prod, owner } = data;
     const product = await pm.getProductById(prod);
     const products = await productService.get({});
-    if (product.owner === owner) {
+    if (product.owner === owner || owner === "admin") {
       await pm.deleteProduct(prod);
       const allProducts = await productService.get({ limit: products.totalDocs });
       let deleted = true;
